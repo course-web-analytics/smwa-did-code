@@ -97,6 +97,18 @@ df %>%
   geom_line(aes(x = time_period, y = mean_sales, color = treatment_group)) +
   theme_bw()
 
+# --- Using fixest and full data ---#
+
+df <- df %>% mutate(treated = as.numeric(treatment_group == "treatment"))
+feols(sales ~ treated:after | customer_id + time_period,
+      data = df)
+
+df <- df %>% mutate(treated = as.numeric(treatment_group == "treatment"))
+es_mod <- feols(sales ~ i(time_period, treated, ref = 10) |
+                  customer_id + time_period,
+                data = df)
+iplot(es_mod)
+
 
 # --- Bonus: link between DiD and CUPED  --- #
 cuped_df <- 
